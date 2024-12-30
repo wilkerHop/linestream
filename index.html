@@ -14,15 +14,18 @@
       .line {
         margin: 20px auto;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
+        position: relative;
+        height: 200px;
+        border-left: 1px solid #ccc;
       }
       .point {
         width: 10px;
         height: 10px;
         background-color: blue;
         border-radius: 50%;
-        margin: 0 5px;
+        position: absolute;
       }
       button {
         padding: 10px 20px;
@@ -43,9 +46,12 @@
       // Function to render the line as points
       function renderLine() {
         lineContainer.innerHTML = '';
-        Line.points.forEach((point) => {
+        const containerHeight = lineContainer.offsetHeight;
+        Line.points.forEach((point, index) => {
           const pointDiv = document.createElement('div');
           pointDiv.className = 'point';
+          pointDiv.style.left = `${index * 20}px`;
+          pointDiv.style.bottom = `${point.currentPosition * 10}px`;
           lineContainer.appendChild(pointDiv);
         });
       }
