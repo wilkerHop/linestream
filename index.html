@@ -13,19 +13,18 @@
       }
       .line {
         margin: 20px auto;
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
         position: relative;
         height: 200px;
+        width: 100%;
         border-left: 1px solid #ccc;
       }
-      .point {
-        width: 10px;
-        height: 10px;
-        background-color: blue;
-        border-radius: 50%;
+      svg {
         position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
       }
       button {
         padding: 10px 20px;
@@ -36,23 +35,52 @@
   </head>
   <body>
     <h1>Line Visualization</h1>
-    <div class="line" id="lineContainer"></div>
+    <div class="line" id="lineContainer">
+      <svg id="lineSvg"></svg>
+    </div>
     <button id="generateButton">Generate New Point</button>
 
     <script>
       const lineContainer = document.getElementById('lineContainer');
+      const lineSvg = document.getElementById('lineSvg');
       const generateButton = document.getElementById('generateButton');
 
-      // Function to render the line as points
+      // Function to render the line as points and connections
       function renderLine() {
-        lineContainer.innerHTML = '';
+        lineSvg.innerHTML = ''; // Clear the SVG
+        const svgNamespace = 'http://www.w3.org/2000/svg';
         const containerHeight = lineContainer.offsetHeight;
+
         Line.points.forEach((point, index) => {
-          const pointDiv = document.createElement('div');
-          pointDiv.className = 'point';
-          pointDiv.style.left = `${index * 20}px`;
-          pointDiv.style.bottom = `${point.currentPosition * 10}px`;
-          lineContainer.appendChild(pointDiv);
+          // Create a circle for each point
+          const circle = document.createElementNS(svgNamespace, 'circle');
+          circle.setAttribute('cx', index * 20);
+          circle.setAttribute(
+            'cy',
+            containerHeight - point.currentPosition * 10
+          );
+          circle.setAttribute('r', 5);
+          circle.setAttribute('fill', 'blue');
+          lineSvg.appendChild(circle);
+
+          // Connect points with a line
+          if (index > 0) {
+            const previousPoint = Line.points[index - 1];
+            const line = document.createElementNS(svgNamespace, 'line');
+            line.setAttribute('x1', (index - 1) * 20);
+            line.setAttribute(
+              'y1',
+              containerHeight - previousPoint.currentPosition * 10
+            );
+            line.setAttribute('x2', index * 20);
+            line.setAttribute(
+              'y2',
+              containerHeight - point.currentPosition * 10
+            );
+            line.setAttribute('stroke', 'black');
+            line.setAttribute('stroke-width', '2');
+            lineSvg.appendChild(line);
+          }
         });
       }
 
